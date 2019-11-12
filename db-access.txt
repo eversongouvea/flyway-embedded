@@ -1,0 +1,37 @@
+  
+--Acesso por role
+CREATE ROLE db_flyway
+GRANT CREATE TABLE TO db_flyway
+GRANT CREATE VIEW TO db_flyway
+GRANT CREATE FUNCTION TO db_flyway
+GRANT CREATE PROCEDURE TO db_flyway
+GRANT EXECUTE TO db_flyway
+GRANT ALTER ANY SCHEMA TO db_flyway
+GRANT SELECT, INSERT, UPDATE, DELETE TO db_flyway
+
+CREATE LOGIN flyway WITH PASSWORD = '340$Uuxwp7Mcxo7Khy';
+CREATE USER flyway FOR LOGIN flyway; 
+ALTER ROLE db_flyway ADD MEMBER flyway
+
+--Acesso por usuário
+CREATE LOGIN flyway WITH PASSWORD = '340$Uuxwp7Mcxo7Khy';
+CREATE USER flyway FOR LOGIN flyway; 
+EXEC sp_addrolemember 'db_datareader', 'flyway';
+EXEC sp_addrolemember 'db_datawriter', 'flyway';
+EXEC sp_addrolemember 'db_ddladmin', 'flyway';
+GRANT EXECUTE TO flyway
+
+
+
+--Consultando permissões
+EXEC DEV.dbo.sp_helprotect  @username = 'flyway'
+
+-- permissões do usuario no schemas
+USE AdventureWorks;
+SELECT s.name
+FROM sys.schemas s
+WHERE s.principal_id = USER_ID('pinaladmin');
+
+-- retirando as permissões no schemas
+ALTER AUTHORIZATION ON SCHEMA::db_denydatareader TO dbo;
+ALTER AUTHORIZATION ON SCHEMA::db_denydatawriter TO dbo;
